@@ -1,0 +1,44 @@
+[project]
+name = "lucid"
+version = "0.1.0"
+description = "A website for pastoral requests"
+requires-python = ">=3.12.13"
+dependencies = [
+    "django>=6.0.7",
+    "gunicorn>=26.0.0",
+    "psycopg2-binary>=2.9.12",
+    "python-dotenv>=1.2.2",
+]
+
+[dependency-groups]
+dev = [
+    "ruff>=0.16.0",
+    "ty>=0.0.63",
+]
+
+[tool.ruff]
+line-length = 100
+target-version = "py312"
+exclude = ["migrations", ".venv"]
+
+[tool.ruff.lint]
+select = [
+    "E",   # pycodestyle errors
+    "F",   # pyflakes
+    "I",   # isort (import sorting)
+    "UP",  # pyupgrade (modern Python syntax)
+    "B",   # bugbear (common bug patterns)
+    "DJ",  # flake8-django (Django-specific rules)
+]
+ignore = [
+    "DJ001",  # allow nullable CharField (sometimes fine in Django)
+]
+
+[tool.ruff.lint.isort]
+known-first-party = ["lucid", "config"]
+
+[tool.ty.environment]
+python-version = "3.12"
+
+[tool.ty.rules]
+possibly-missing-attribute = "warn"
