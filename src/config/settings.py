@@ -9,6 +9,7 @@ https://docs.djangoproject.com/en/6.0/topics/settings/
 For the full list of settings and their values, see
 https://docs.djangoproject.com/en/6.0/ref/settings/
 """
+from django.conf.global_settings import CSRF_COOKIE_SECURE, SESSION_COOKIE_SECURE, SECURE_SSL_REDIRECT, SECURE_HSTS_SECONDS
 
 from pathlib import Path
 import os
@@ -39,6 +40,13 @@ if PROD:
     ALLOWED_HOSTS: list[str] = PROD_ALLOW
 else:
     ALLOWED_HOSTS: list[str] = LOCAL_ALLOW
+    
+CSRF_COOKIE_SECURE: bool = PROD
+SESSION_COOKIE_SECURE: bool = PROD
+SECURE_SSL_REDIRECT: bool = PROD
+SECURE_HSTS_SECONDS: int = 30
+SECURE_HSTS_INCLUDE_SUBDOMAINS: bool = PROD
+SECURE_HSTS_PRELOAD: bool = PROD
 
 
 # Application definition
