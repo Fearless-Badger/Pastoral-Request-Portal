@@ -219,3 +219,6 @@ __marimo__/
 
 # Local working notes
 plan.md
+
+# Postgres backup dumps
+backups/
