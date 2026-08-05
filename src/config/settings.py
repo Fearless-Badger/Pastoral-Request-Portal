@@ -9,8 +9,6 @@ https://docs.djangoproject.com/en/6.0/topics/settings/
 For the full list of settings and their values, see
 https://docs.djangoproject.com/en/6.0/ref/settings/
 """
-from django.conf.global_settings import CSRF_COOKIE_SECURE, SESSION_COOKIE_SECURE, SECURE_SSL_REDIRECT, SECURE_HSTS_SECONDS
-
 from pathlib import Path
 import os
 from dotenv import load_dotenv
@@ -31,16 +29,18 @@ SECRET_KEY: str | None = os.getenv(key="SECRET_KEY")
 
 PROD: bool = os.getenv("IS_PROD", "False") == "True"
 
-DEBUG : bool = True if not PROD else False
+DEBUG : bool = not PROD
+
+SITE_DOMAIN: str = os.getenv("SITE_DOMAIN", "")
 
 LOCAL_ALLOW: list[str] = ["localhost", "127.0.0.1"]
-PROD_ALLOW: list[str] = [""]
+PROD_ALLOW: list[str] = [SITE_DOMAIN]
 
-if PROD: 
+if PROD:
     ALLOWED_HOSTS: list[str] = PROD_ALLOW
 else:
     ALLOWED_HOSTS: list[str] = LOCAL_ALLOW
-    
+
 CSRF_COOKIE_SECURE: bool = PROD
 SESSION_COOKIE_SECURE: bool = PROD
 SECURE_SSL_REDIRECT: bool = PROD
@@ -98,6 +98,11 @@ DATABASES = {
     "default": {
         "ENGINE": "django.db.backends.sqlite3",
         "NAME": BASE_DIR / "db.sqlite3",
+        "OPTIONS": {
+            "init_command": "PRAGMA journal_mode=WAL; PRAGMA synchronous=NORMAL;",
+            "transaction_mode": "IMMEDIATE",
+            "timeout": 20,
+        },
     }
 }
 
