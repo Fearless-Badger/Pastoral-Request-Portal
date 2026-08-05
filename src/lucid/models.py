@@ -1,4 +1,3 @@
-from django.contrib import admin
 from django.db import models
 
 class PrayerRequest(models.Model):
@@ -8,7 +7,9 @@ class PrayerRequest(models.Model):
         PRAYED_FOR = "prayed", "Prayed For"
         ARCHIVED = "archived", "Archived"
         
-
+    class Meta: 
+        verbose_name = "Prayer Request"
+        verbose_name_plural = "Prayer Requests"
 
     
     name = models.CharField(max_length=100, blank=True)
@@ -21,14 +22,6 @@ class PrayerRequest(models.Model):
     submitted_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
     
-    def __str__(self): 
-        return f"{self.name or 'Anonymous'} - {str(self.request)[:40]}" 
-
-
-@admin.register(PrayerRequest)
-class PrayerRequestAdmin(admin.ModelAdmin):
-    list_display = ["name", "status", "submitted_at"]
-    list_filter = ["status"]
-    search_fields = ["name", "request"]
-    readonly_fields = ["request", "name", "submitted_at", "updated_at"]
+    def __str__(self):
+        return f"{self.name or 'Anonymous'} - {str(self.request)[:40]}"
 
