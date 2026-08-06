@@ -1,0 +1,103 @@
+{% load static %}<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Prayer Requests | Lake Hills Baptist Church</title>
+  <link rel="icon" href="{% static 'lucid/img/favicon.jpg' %}">
+  <link rel="apple-touch-icon" href="{% static 'lucid/img/favicon.jpg' %}">
+  <link rel="stylesheet" href="{% static 'lucid/css/site.css' %}">
+</head>
+<body>
+
+  <header class="hero">
+    <div class="hero__bar">
+      <a class="hero__logo" href="https://www.lakehillsonline.org/" target="_blank" rel="noopener">
+        <img src="{% static 'lucid/img/logo.png' %}" alt="Lake Hills Baptist Church" width="352" height="200">
+      </a>
+      <a class="hero__cta" href="https://www.lakehillsonline.org/next-steps/" target="_blank" rel="noopener">Next Steps</a>
+    </div>
+
+    <h1>Prayer Requests</h1>
+    <p>
+      Send us something to pray about. Our pastors read every request that
+      comes in.
+    </p>
+  </header>
+
+  <main class="wrap">
+    <section class="card">
+
+      {% if messages %}
+        <ul class="messages">
+          {% for message in messages %}
+            <li{% if message.tags %} class="{{ message.tags }}"{% endif %}>{{ message }}</li>
+          {% endfor %}
+        </ul>
+      {% endif %}
+
+      <form method="post" novalidate>
+        {% csrf_token %}
+
+        <div class="field">
+          <label for="{{ form.name.id_for_label }}">
+            Your name <span class="optional">(optional)</span>
+          </label>
+          {{ form.name.errors }}
+          {{ form.name }}
+        </div>
+
+        <div class="field">
+          <label for="{{ form.request.id_for_label }}">Your request</label>
+          {{ form.request.errors }}
+          {{ form.request }}
+        </div>
+
+        <button class="btn" type="submit">Submit request</button>
+      </form>
+
+    </section>
+
+    <p class="reassure">Only our pastoral staff can see what you send.</p>
+  </main>
+
+  <footer class="site-footer">
+    <div class="footer__inner">
+
+      <div class="footer__col">
+        <h2>Visit</h2>
+        <p>9209 W. 85th Ave.<br>Schererville, IN 46375</p>
+        <p>219.365.4747</p>
+      </div>
+
+      <div class="footer__col">
+        <h2>Office Hours</h2>
+        <dl class="hours">
+          <dt>Monday</dt>
+          <dd>Closed</dd>
+        </dl>
+        <dl class="hours">
+          <dt>Tue - Fri</dt>
+          <dd>9:00AM - 3:00PM</dd>
+        </dl>
+      </div>
+
+      <div class="footer__col">
+        <h2>Links</h2>
+        <ul>
+          <li><a href="https://www.lakehillsonline.org/ministries/life-groups/" target="_blank" rel="noopener">Life Groups</a></li>
+          <li><a href="https://www.lakehillsonline.org/ministries/griefshare/" target="_blank" rel="noopener">GriefShare</a></li>
+          <li><a href="https://www.lakehillsonline.org/sermons/" target="_blank" rel="noopener">Sermons</a></li>
+          <li><a href="https://www.lakehillsonline.org/contact/" target="_blank" rel="noopener">Contact</a></li>
+        </ul>
+      </div>
+
+    </div>
+
+    <div class="footer__bar">
+      Copyright &copy; {% now "Y" %} Lake Hills Baptist Church
+    </div>
+  </footer>
+
+</body>
+</html>

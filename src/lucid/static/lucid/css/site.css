@@ -1,0 +1,326 @@
+/* Lake Hills prayer request portal
+   Palette anchors on the church site's footer teal (#0a4049) and pulls the
+   header's purple in as a gradient partner. */
+
+:root {
+  --teal-900: #0a4049;
+  --teal-800: #0e5464;
+  --teal-700: #14707f;
+  --plum-700: #4a3570;
+  --plum-500: #6b4f9e;
+
+  --ink: #15242a;
+  --muted: #5d6d74;
+  --line: #dde4e7;
+  --page: #f3f6f7;
+  --card: #ffffff;
+
+  --ok-bg: #e7f4ec;
+  --ok-line: #2e8b57;
+  --err: #b3261e;
+  --err-bg: #fdecea;
+
+  --radius: 10px;
+  --shadow: 0 1px 2px rgba(10, 64, 73, 0.06), 0 8px 24px rgba(10, 64, 73, 0.08);
+}
+
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+}
+
+body {
+  margin: 0;
+  font-family: "Segoe UI", system-ui, -apple-system, sans-serif;
+  line-height: 1.6;
+  color: var(--ink);
+  background: var(--page);
+  display: flex;
+  flex-direction: column;
+  min-height: 100vh;
+}
+
+/* ---------- Hero ---------- */
+
+.hero {
+  /* 135deg runs top-left to bottom-right: purple in, teal out. */
+  background: linear-gradient(135deg, var(--plum-500) 0%, #26385f 45%, var(--teal-900) 100%);
+  color: #fff;
+  padding: 1.25rem 1.25rem 5.5rem;
+  text-align: center;
+}
+
+/* Logo left, Next Steps right. Width matches .footer__inner so the two
+   ends of the page line up. */
+.hero__bar {
+  max-width: 60rem;
+  margin: 0 auto 2.75rem;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+}
+
+/* The wordmark is a transparent PNG, so it sits straight on the gradient with
+   no plate behind it. Scales with the viewport so "BAPTIST CHURCH" stays
+   legible on a phone without crowding the bar. */
+.hero__logo {
+  display: flex;
+}
+
+.hero__logo img {
+  display: block;
+  width: clamp(9rem, 34vw, 12.5rem);
+  height: auto;
+  /* Recolors the green wordmark to white without a second image file:
+     brightness(0) crushes every opaque pixel to black, invert(1) flips it.
+     Alpha is untouched, so the antialiased edges stay clean. */
+  filter: brightness(0) invert(1);
+}
+
+.hero__cta {
+  padding: 0.55rem 1.15rem;
+  font-size: 0.88rem;
+  font-weight: 600;
+  color: #fff;
+  background: var(--teal-800);
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  border-radius: 999px;
+  text-decoration: none;
+  white-space: nowrap;
+  transition: background 0.15s;
+}
+
+.hero__cta:hover {
+  background: var(--teal-900);
+}
+
+.hero__logo:focus-visible,
+.hero__cta:focus-visible {
+  outline: 3px solid #fff;
+  outline-offset: 3px;
+}
+
+.hero h1 {
+  margin: 0;
+  font-size: clamp(1.9rem, 5vw, 2.6rem);
+  font-weight: 600;
+  letter-spacing: -0.01em;
+}
+
+/* The subtitle paragraph, matched by position so it needs no class. */
+.hero h1 + p {
+  margin: 0.85rem auto 0;
+  max-width: 34rem;
+  color: rgba(255, 255, 255, 0.85);
+}
+
+/* ---------- Layout ---------- */
+
+.wrap {
+  width: 100%;
+  max-width: 40rem;
+  margin: -3.5rem auto 0;
+  padding: 0 1.25rem 3.5rem;
+  flex: 1;
+}
+
+.card {
+  background: var(--card);
+  border: 1px solid var(--line);
+  border-radius: var(--radius);
+  box-shadow: var(--shadow);
+  padding: 2rem;
+}
+
+.reassure {
+  margin: 1.5rem 0 0;
+  font-size: 0.88rem;
+  color: var(--muted);
+  text-align: center;
+}
+
+/* ---------- Form ---------- */
+
+.field + .field {
+  margin-top: 1.5rem;
+}
+
+.field label {
+  display: block;
+  font-weight: 600;
+  font-size: 0.92rem;
+  margin-bottom: 0.4rem;
+}
+
+.optional {
+  font-weight: 400;
+  color: var(--muted);
+}
+
+.field input[type="text"],
+.field textarea {
+  width: 100%;
+  padding: 0.7rem 0.8rem;
+  font: inherit;
+  color: var(--ink);
+  background: #fff;
+  border: 1px solid #c3ced3;
+  border-radius: 8px;
+  transition: border-color 0.15s, box-shadow 0.15s;
+}
+
+.field textarea {
+  min-height: 9rem;
+  resize: vertical;
+}
+
+.field input[type="text"]:focus,
+.field textarea:focus {
+  outline: none;
+  border-color: var(--teal-700);
+  box-shadow: 0 0 0 3px rgba(20, 112, 127, 0.18);
+}
+
+.btn {
+  margin-top: 1.75rem;
+  width: 100%;
+  padding: 0.8rem 1.5rem;
+  font: inherit;
+  font-weight: 600;
+  color: #fff;
+  background: var(--teal-800);
+  border: none;
+  border-radius: 8px;
+  cursor: pointer;
+  transition: background 0.15s;
+}
+
+.btn:hover {
+  background: var(--teal-900);
+}
+
+.btn:focus-visible {
+  outline: 3px solid var(--plum-500);
+  outline-offset: 2px;
+}
+
+/* ---------- Messages & errors ---------- */
+
+.messages {
+  list-style: none;
+  margin: 0 0 1.5rem;
+  padding: 0;
+}
+
+.messages li {
+  padding: 0.85rem 1rem;
+  border-radius: 8px;
+  font-size: 0.94rem;
+}
+
+.messages .success {
+  background: var(--ok-bg);
+  border-left: 4px solid var(--ok-line);
+}
+
+.errorlist {
+  list-style: none;
+  margin: 0 0 0.5rem;
+  padding: 0.5rem 0.75rem;
+  font-size: 0.87rem;
+  color: var(--err);
+  background: var(--err-bg);
+  border-radius: 6px;
+}
+
+/* ---------- Footer ---------- */
+
+.site-footer {
+  background: var(--teal-900);
+  color: rgba(255, 255, 255, 0.82);
+  font-size: 0.9rem;
+}
+
+.footer__inner {
+  max-width: 60rem;
+  margin: 0 auto;
+  padding: 2.75rem 1.5rem 2rem;
+  display: grid;
+  gap: 2rem;
+  grid-template-columns: repeat(auto-fit, minmax(13rem, 1fr));
+}
+
+.footer__col h2 {
+  margin: 0 0 0.75rem;
+  font-size: 0.76rem;
+  font-weight: 600;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: rgba(255, 255, 255, 0.55);
+}
+
+.footer__col p {
+  margin: 0 0 0.4rem;
+}
+
+.footer__col ul {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+
+.footer__col li {
+  margin-bottom: 0.4rem;
+}
+
+.site-footer a {
+  color: #fff;
+  text-decoration: none;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.25);
+  padding-bottom: 1px;
+}
+
+.site-footer a:hover {
+  border-bottom-color: #fff;
+}
+
+.hours {
+  display: flex;
+  justify-content: space-between;
+  gap: 1rem;
+  max-width: 15rem;
+}
+
+.hours dt,
+.hours dd {
+  margin: 0;
+}
+
+.hours dd {
+  color: rgba(255, 255, 255, 0.7);
+  text-align: right;
+}
+
+.footer__bar {
+  border-top: 1px solid rgba(255, 255, 255, 0.14);
+  padding: 1.1rem 1.5rem;
+  text-align: center;
+  font-size: 0.82rem;
+  color: rgba(255, 255, 255, 0.6);
+}
+
+@media (max-width: 30rem) {
+  .hero {
+    padding: 1rem 1rem 4.5rem;
+  }
+
+  .hero__bar {
+    margin-bottom: 2rem;
+  }
+
+  .card {
+    padding: 1.5rem 1.25rem;
+  }
+}

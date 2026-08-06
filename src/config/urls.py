@@ -18,6 +18,9 @@ Including another URLconf
 from django.contrib import admin
 from django.urls import path
 
+from lucid import views
+
 urlpatterns = [
     path("admin/", admin.site.urls),
+    path("", views.submit_request, name="submit_request"),
 ]
