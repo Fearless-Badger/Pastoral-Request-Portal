@@ -1,0 +1,25 @@
+.git
+.gitattributes
+.gitignore
+.venv
+.ruff_cache
+__pycache__
+*.pyc
+
+# Secrets never belong in an image layer. Compose injects .env at runtime.
+.env
+
+# Built fresh inside the image. Copying the local copy in would ship a stale
+# manifest -- and a Windows-generated one contains backslash paths, which
+# produce broken static URLs under DEBUG=False.
+src/staticfiles/
+
+# Local dev database. The real one lives on a volume.
+src/db.sqlite3
+src/db.sqlite3-shm
+src/db.sqlite3-wal
+
+fresh.py
+plan.md
+README.md
+LICENSE

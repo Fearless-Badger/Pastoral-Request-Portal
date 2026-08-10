@@ -20,6 +20,8 @@ load_dotenv()
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
 
+DATA_DIR = Path(os.getenv("DATA_DIR", BASE_DIR))
+
 
 # Quick-start development settings - unsuitable for production
 # See https://docs.djangoproject.com/en/6.0/howto/deployment/checklist/
@@ -41,9 +43,13 @@ if PROD:
 else:
     ALLOWED_HOSTS: list[str] = LOCAL_ALLOW
 
+CSRF_TRUSTED_ORIGINS: list[str] = [f"https://{SITE_DOMAIN}"] if PROD else []
+
 CSRF_COOKIE_SECURE: bool = PROD
 SESSION_COOKIE_SECURE: bool = PROD
 SECURE_SSL_REDIRECT: bool = PROD
+
+SECURE_PROXY_SSL_HEADER: tuple[str, str] = ("HTTP_X_FORWARDED_PROTO", "https")
 SECURE_HSTS_SECONDS: int = 30
 SECURE_HSTS_INCLUDE_SUBDOMAINS: bool = PROD
 SECURE_HSTS_PRELOAD: bool = PROD
@@ -100,7 +106,7 @@ WSGI_APPLICATION = "config.wsgi.application"
 DATABASES = {
     "default": {
         "ENGINE": "django.db.backends.sqlite3",
-        "NAME": BASE_DIR / "db.sqlite3",
+        "NAME": DATA_DIR / "db.sqlite3",
         "OPTIONS": {
             "init_command": "PRAGMA journal_mode=WAL; PRAGMA synchronous=NORMAL;",
             "transaction_mode": "IMMEDIATE",
