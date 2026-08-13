@@ -1,0 +1,524 @@
+/* Staff view. Loaded after site.css, which supplies the :root palette, the
+   body/flex-column shell, .messages and .btn. Nothing here redefines a color;
+   it all comes from the tokens so the two pages can never drift apart. */
+
+/* ---------- Header ---------- */
+
+.staff-head {
+  background: linear-gradient(135deg, var(--plum-500) 0%, #26385f 45%, var(--teal-900) 100%);
+  color: #fff;
+  padding: 1rem 1.25rem 3rem;
+}
+
+/* Matches .footer__inner / .hero__bar so the page edges line up with the
+   public side. */
+.staff-head__bar {
+  max-width: 60rem;
+  margin: 0 auto 1.75rem;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+}
+
+.staff-head__logo {
+  display: flex;
+}
+
+.staff-head__logo img {
+  display: block;
+  width: clamp(7rem, 26vw, 9rem);
+  height: auto;
+  /* Same trick as the public hero: crush to black, then invert to white. */
+  filter: brightness(0) invert(1);
+}
+
+.staff-head__actions {
+  display: flex;
+  align-items: center;
+  gap: 0.6rem;
+}
+
+.staff-head__actions a,
+.staff-head__actions button {
+  padding: 0.4rem 0.9rem;
+  font: inherit;
+  font-size: 0.82rem;
+  font-weight: 600;
+  color: #fff;
+  background: rgba(255, 255, 255, 0.1);
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  border-radius: 999px;
+  text-decoration: none;
+  white-space: nowrap;
+  cursor: pointer;
+  transition: background 0.15s;
+}
+
+.staff-head__actions a:hover,
+.staff-head__actions button:hover {
+  background: rgba(255, 255, 255, 0.2);
+}
+
+.staff-head__actions form {
+  margin: 0;
+}
+
+.staff-head h1 {
+  max-width: 60rem;
+  margin: 0 auto;
+  font-size: clamp(1.5rem, 4vw, 2rem);
+  font-weight: 600;
+  letter-spacing: -0.01em;
+}
+
+.staff-head__logo:focus-visible,
+.staff-head__actions a:focus-visible,
+.staff-head__actions button:focus-visible {
+  outline: 3px solid #fff;
+  outline-offset: 3px;
+}
+
+/* ---------- Layout ---------- */
+
+/* 60rem, not the 40rem of the public .wrap. Rows need the width; a reading
+   column does not. */
+.staff-wrap {
+  width: 100%;
+  max-width: 60rem;
+  margin: -1.5rem auto 0;
+  padding: 0 1.25rem 3.5rem;
+  flex: 1;
+}
+
+.sr-only {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip-path: inset(50%);
+  white-space: nowrap;
+  border: 0;
+}
+
+/* ---------- Status tabs ---------- */
+
+.tabs {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.4rem;
+  margin-bottom: 0.9rem;
+}
+
+.tab {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4rem;
+  padding: 0.45rem 0.9rem;
+  font-size: 0.85rem;
+  font-weight: 600;
+  color: var(--ink);
+  background: var(--card);
+  border: 1px solid var(--line);
+  border-radius: 999px;
+  text-decoration: none;
+}
+
+.tab:hover {
+  border-color: var(--teal-700);
+}
+
+.tab--on {
+  color: #fff;
+  background: var(--teal-800);
+  border-color: var(--teal-800);
+}
+
+.tab__count {
+  font-size: 0.76rem;
+  font-weight: 400;
+  color: var(--muted);
+}
+
+.tab--on .tab__count {
+  color: rgba(255, 255, 255, 0.75);
+}
+
+.tab:focus-visible {
+  outline: 3px solid var(--plum-500);
+  outline-offset: 2px;
+}
+
+/* ---------- Filter bar ---------- */
+
+.filters {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0.5rem;
+  margin-bottom: 1.25rem;
+}
+
+.filters label {
+  display: flex;
+  margin: 0;
+}
+
+/* Takes the leftover width so the two selects stay their natural size. */
+.filters__search {
+  flex: 1 1 14rem;
+}
+
+/* site.css scopes its control styling to .field input[type="text"] and
+   .field textarea, so search inputs and selects inherit nothing. */
+.filters input[type="search"],
+.filters select {
+  width: 100%;
+  padding: 0.5rem 0.7rem;
+  font: inherit;
+  font-size: 0.9rem;
+  color: var(--ink);
+  background: #fff;
+  border: 1px solid #c3ced3;
+  border-radius: 8px;
+  transition: border-color 0.15s, box-shadow 0.15s;
+}
+
+.filters input[type="search"]:focus,
+.filters select:focus {
+  outline: none;
+  border-color: var(--teal-700);
+  box-shadow: 0 0 0 3px rgba(20, 112, 127, 0.18);
+}
+
+.filters__clear {
+  font-size: 0.85rem;
+  color: var(--muted);
+}
+
+/* ---------- Button variants ---------- */
+
+/* .btn is a full-width block with a 1.75rem top margin, which cannot sit
+   inline. These two override just enough of it. */
+.btn--sm {
+  width: auto;
+  margin-top: 0;
+  padding: 0.5rem 0.9rem;
+  font-size: 0.85rem;
+  border-radius: 8px;
+}
+
+.btn--ghost {
+  color: var(--teal-800);
+  background: transparent;
+  border: 1px solid var(--line);
+}
+
+.btn--ghost:hover {
+  color: var(--teal-900);
+  background: var(--page);
+  border-color: var(--teal-700);
+}
+
+/* ---------- Rows ---------- */
+
+/* One surface with hairline dividers, not a stack of cards. No per-row radius
+   or shadow, which is what keeps them reading as rows. */
+.rows {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  background: var(--card);
+  border: 1px solid var(--line);
+  border-radius: var(--radius);
+  box-shadow: var(--shadow);
+  overflow: hidden;
+}
+
+.row + .row {
+  border-top: 1px solid var(--line);
+}
+
+.row--empty {
+  color: var(--muted);
+  text-align: center;
+  padding: 2.5rem 1.25rem;
+}
+
+/* The whole row is the button that opens the modal, so everything a browser
+   normally puts on a button has to come back off. */
+.row__open {
+  display: grid;
+  grid-template-columns: auto 1fr;
+  gap: 0.9rem;
+  width: 100%;
+  padding: 1.1rem 1.25rem;
+  font: inherit;
+  color: inherit;
+  text-align: left;
+  background: none;
+  border: 0;
+  cursor: pointer;
+}
+
+.row__open:hover {
+  background: var(--page);
+}
+
+/* Inset so the ring stays on this row instead of overlapping its neighbours. */
+.row__open:focus-visible {
+  outline: 3px solid var(--plum-500);
+  outline-offset: -3px;
+}
+
+.row__body {
+  display: block;
+  min-width: 0;
+}
+
+.row__text {
+  display: block;
+  /* Preserves the line breaks someone typed into the textarea. */
+  white-space: pre-wrap;
+  margin-bottom: 0.4rem;
+  overflow-wrap: anywhere;
+}
+
+.row__who {
+  display: block;
+  font-size: 0.85rem;
+  color: var(--muted);
+}
+
+/* ---------- Status pills ---------- */
+
+.pill {
+  align-self: start;
+  padding: 0.25rem 0.6rem;
+  font-size: 0.7rem;
+  font-weight: 600;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  border-radius: 999px;
+  white-space: nowrap;
+}
+
+.pill--new {
+  color: #fff;
+  background: var(--teal-800);
+}
+
+.pill--prayed {
+  color: var(--ok-line);
+  background: var(--ok-bg);
+  border: 1px solid var(--ok-line);
+}
+
+.pill--archived {
+  color: var(--muted);
+  background: var(--page);
+  border: 1px solid var(--line);
+}
+
+/* ---------- Request modal ---------- */
+
+/* Belt and braces. Browsers that support <dialog> already hide a closed one,
+   but without this a browser that does not would dump every modal's contents
+   inline into the list. */
+dialog:not([open]) {
+  display: none;
+}
+
+/* No padding on the panel itself. The sections inside carry it, which is what
+   lets a click landing on the dialog be read as a click on the backdrop. */
+.modal {
+  width: min(34rem, calc(100vw - 2rem));
+  max-height: calc(100vh - 4rem);
+  padding: 0;
+  color: var(--ink);
+  background: var(--card);
+  border: 1px solid var(--line);
+  border-radius: var(--radius);
+  box-shadow: var(--shadow);
+  overflow: auto;
+}
+
+.modal::backdrop {
+  background: rgba(10, 64, 73, 0.5);
+}
+
+.modal__head {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 1rem;
+  padding: 1.25rem 1.35rem 0.9rem;
+}
+
+.modal__heading {
+  min-width: 0;
+}
+
+.modal__dismiss {
+  margin: 0;
+  flex-shrink: 0;
+}
+
+/* Negative margins pull the hit area out into the panel padding so the glyph
+   itself lands in the corner. */
+.modal__dismiss button {
+  margin: -0.5rem -0.6rem 0 0;
+  padding: 0.5rem 0.6rem;
+  font: inherit;
+  font-size: 1.4rem;
+  line-height: 1;
+  color: var(--muted);
+  background: none;
+  border: 0;
+  cursor: pointer;
+}
+
+.modal__dismiss button:hover {
+  color: var(--ink);
+}
+
+.modal__dismiss button:focus-visible {
+  outline: 3px solid var(--plum-500);
+  outline-offset: 0;
+  border-radius: 6px;
+}
+
+.modal__who {
+  margin: 0 0 0.4rem;
+  font-size: 1.15rem;
+  font-weight: 600;
+  letter-spacing: -0.01em;
+}
+
+.modal__when {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0.55rem;
+  margin: 0;
+  font-size: 0.85rem;
+  color: var(--muted);
+}
+
+/* The reason the modal exists: the request, given room to be read. */
+.modal__text {
+  margin: 0;
+  padding: 1.1rem 1.35rem;
+  white-space: pre-wrap;
+  overflow-wrap: anywhere;
+  background: var(--page);
+  border-top: 1px solid var(--line);
+  border-bottom: 1px solid var(--line);
+}
+
+.modal__controls {
+  padding: 1.1rem 1.35rem 1.25rem;
+}
+
+.modal__set {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0.5rem;
+  margin: 0 0 0.9rem;
+}
+
+.modal__set label {
+  margin: 0;
+  font-size: 0.85rem;
+  font-weight: 600;
+}
+
+.modal__set select {
+  flex: 1 1 8rem;
+  padding: 0.5rem 0.7rem;
+  font: inherit;
+  font-size: 0.9rem;
+  color: var(--ink);
+  background: #fff;
+  border: 1px solid #c3ced3;
+  border-radius: 8px;
+}
+
+.modal__set select:focus {
+  outline: none;
+  border-color: var(--teal-700);
+  box-shadow: 0 0 0 3px rgba(20, 112, 127, 0.18);
+}
+
+/* One-click shortcuts for the two moves that happen most, with Close pushed to
+   the far end so it is never hit by accident. */
+.modal__quick {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.4rem;
+  padding-top: 0.9rem;
+  border-top: 1px solid var(--line);
+}
+
+.modal__quick form {
+  margin: 0;
+}
+
+.modal__quick form:last-child {
+  margin-left: auto;
+}
+
+/* ---------- Pager ---------- */
+
+.pager {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+  margin-top: 1.25rem;
+  font-size: 0.88rem;
+}
+
+.pager a {
+  color: var(--teal-800);
+  font-weight: 600;
+}
+
+.pager span {
+  color: var(--muted);
+}
+
+.pager__at {
+  font-size: 0.82rem;
+}
+
+/* ---------- Narrow screens ---------- */
+
+/* Reuses the one breakpoint site.css already establishes. */
+@media (max-width: 30rem) {
+  .staff-head {
+    padding: 0.85rem 1rem 2.5rem;
+  }
+
+  /* Pill above the text instead of beside it, so a long request is not
+     squeezed into a narrow second column. */
+  .row__open {
+    grid-template-columns: 1fr;
+    gap: 0.55rem;
+  }
+
+  /* Close keeps its own line down here rather than sharing one with the
+     actions, where a mis-tap would archive something. */
+  .modal__quick form:last-child {
+    width: 100%;
+    margin-left: 0;
+    margin-top: 0.3rem;
+  }
+
+  .modal__quick form:last-child .btn--sm {
+    width: 100%;
+  }
+}

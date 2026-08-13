@@ -1,0 +1,216 @@
+{% load static humanize %}<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Staff | Prayer Requests</title>
+  <meta name="robots" content="noindex, nofollow">
+  <link rel="icon" href="{% static 'lucid/img/favicon.jpg' %}">
+  <link rel="stylesheet" href="{% static 'lucid/css/site.css' %}">
+  <link rel="stylesheet" href="{% static 'lucid/css/staff.css' %}">
+</head>
+<body>
+
+  <header class="staff-head">
+    <div class="staff-head__bar">
+      <a class="staff-head__logo" href="{% url 'submit_request' %}">
+        <img src="{% static 'lucid/img/logo.png' %}" alt="Lake Hills Baptist Church" width="352" height="200">
+      </a>
+
+      <div class="staff-head__actions">
+        <a href="/admin/">Admin</a>
+        <form method="post" action="{% url 'admin:logout' %}">
+          {% csrf_token %}
+          <button type="submit">Sign out</button>
+        </form>
+      </div>
+    </div>
+
+    <h1>Prayer Requests</h1>
+  </header>
+
+  <main class="staff-wrap">
+
+    {% if messages %}
+      <ul class="messages">
+        {% for message in messages %}
+          <li{% if message.tags %} class="{{ message.tags }}"{% endif %}>{{ message }}</li>
+        {% endfor %}
+      </ul>
+    {% endif %}
+
+    <nav class="tabs" aria-label="Filter by status">
+      {% for tab in tabs %}
+        <a class="tab{% if tab.current %} tab--on{% endif %}"
+           href="{% querystring status=tab.key page=None %}"
+           {% if tab.current %}aria-current="page"{% endif %}>
+          {{ tab.label }} <span class="tab__count">{{ tab.count }}</span>
+        </a>
+      {% endfor %}
+    </nav>
+
+    <form class="filters" method="get">
+      {% comment %}
+        Carries the active tab so searching does not knock you back to the
+        default one. `page` is deliberately absent, which resets to page 1.
+      {% endcomment %}
+      <input type="hidden" name="status" value="{{ status }}">
+
+      <label class="filters__search">
+        <span class="sr-only">Search requests</span>
+        <input type="search" name="q" value="{{ query }}"
+               placeholder="Search name or request text">
+      </label>
+
+      <label>
+        <span class="sr-only">Sort order</span>
+        <select name="sort">
+          <option value="newest" {% if sort == "newest" %}selected{% endif %}>Newest first</option>
+          <option value="oldest" {% if sort == "oldest" %}selected{% endif %}>Oldest first</option>
+        </select>
+      </label>
+
+      <label>
+        <span class="sr-only">Time window</span>
+        <select name="days">
+          <option value="" {% if not days %}selected{% endif %}>All time</option>
+          <option value="7" {% if days == "7" %}selected{% endif %}>Last 7 days</option>
+          <option value="30" {% if days == "30" %}selected{% endif %}>Last 30 days</option>
+        </select>
+      </label>
+
+      <button class="btn btn--sm" type="submit">Apply</button>
+      {% if query or days or sort != "newest" %}
+        <a class="filters__clear" href="{% querystring q=None days=None sort=None page=None %}">Clear</a>
+      {% endif %}
+    </form>
+
+    {% comment %}
+      Every row carries its own dialog, rendered inline. At 25 rows a page that
+      is cheap, and it keeps the whole thing server-rendered with no fetch.
+      A button can only hold phrasing content, so the row uses spans, not divs.
+    {% endcomment %}
+    <ul class="rows">
+      {% for item in page %}
+        <li class="row">
+          <button class="row__open" type="button"
+                  aria-haspopup="dialog" data-dialog="request-{{ item.pk }}">
+            <span class="pill pill--{{ item.status }}">{{ item.get_status_display }}</span>
+
+            <span class="row__body">
+              <span class="row__text">{{ item.request }}</span>
+              <span class="row__who">
+                {{ item.name|default:"Anonymous" }}
+                &middot;
+                <time datetime="{{ item.submitted_at|date:'c' }}">{{ item.submitted_at|naturaltime }}</time>
+              </span>
+            </span>
+          </button>
+
+          <dialog class="modal" id="request-{{ item.pk }}"
+                  aria-labelledby="who-{{ item.pk }}">
+            <header class="modal__head">
+              <div class="modal__heading">
+                <h2 class="modal__who" id="who-{{ item.pk }}">{{ item.name|default:"Anonymous" }}</h2>
+                <p class="modal__when">
+                  <span class="pill pill--{{ item.status }}">{{ item.get_status_display }}</span>
+                  <time datetime="{{ item.submitted_at|date:'c' }}">{{ item.submitted_at|date:"F j, Y" }} at {{ item.submitted_at|date:"g:i a" }}</time>
+                </p>
+              </div>
+
+              {% comment %}
+                method="dialog" closes the modal natively, so none of the close
+                controls need a script of their own.
+              {% endcomment %}
+              <form class="modal__dismiss" method="dialog">
+                <button type="submit" aria-label="Close">&times;</button>
+              </form>
+            </header>
+
+            <p class="modal__text">{{ item.request }}</p>
+
+            <div class="modal__controls">
+              <form class="modal__set" method="post" action="{% querystring %}">
+                {% csrf_token %}
+                <input type="hidden" name="pk" value="{{ item.pk }}">
+                <label for="status-{{ item.pk }}">Status</label>
+                <select id="status-{{ item.pk }}" name="status">
+                  {% for value, label in statuses %}
+                    <option value="{{ value }}" {% if item.status == value %}selected{% endif %}>{{ label }}</option>
+                  {% endfor %}
+                </select>
+                <button class="btn btn--sm" type="submit">Save</button>
+              </form>
+
+              <div class="modal__quick">
+                {% if item.status != "prayed" %}
+                  <form method="post" action="{% querystring %}">
+                    {% csrf_token %}
+                    <input type="hidden" name="pk" value="{{ item.pk }}">
+                    <input type="hidden" name="status" value="prayed">
+                    <button class="btn btn--sm" type="submit">Prayed for</button>
+                  </form>
+                {% else %}
+                  <form method="post" action="{% querystring %}">
+                    {% csrf_token %}
+                    <input type="hidden" name="pk" value="{{ item.pk }}">
+                    <input type="hidden" name="status" value="new">
+                    <button class="btn btn--sm btn--ghost" type="submit">Back to new</button>
+                  </form>
+                {% endif %}
+
+                {% if item.status != "archived" %}
+                  <form method="post" action="{% querystring %}">
+                    {% csrf_token %}
+                    <input type="hidden" name="pk" value="{{ item.pk }}">
+                    <input type="hidden" name="status" value="archived">
+                    <button class="btn btn--sm btn--ghost" type="submit">Archive</button>
+                  </form>
+                {% endif %}
+
+                <form method="dialog">
+                  <button class="btn btn--sm btn--ghost" type="submit">Close</button>
+                </form>
+              </div>
+            </div>
+          </dialog>
+        </li>
+      {% empty %}
+        <li class="row row--empty">
+          {% if query %}
+            Nothing matches &ldquo;{{ query }}&rdquo; in this view.
+          {% else %}
+            No requests here yet.
+          {% endif %}
+        </li>
+      {% endfor %}
+    </ul>
+
+    {% if page.paginator.num_pages > 1 %}
+      <nav class="pager" aria-label="Pagination">
+        {% comment %}
+          "Previous/Next" rather than "Newer/Older", which would read backwards
+          whenever the sort is flipped to oldest-first.
+        {% endcomment %}
+        {% if page.has_previous %}
+          <a href="{% querystring page=page.previous_page_number %}">&larr; Previous</a>
+        {% else %}
+          <span>&larr; Previous</span>
+        {% endif %}
+
+        <span class="pager__at">Page {{ page.number }} of {{ page.paginator.num_pages }}</span>
+
+        {% if page.has_next %}
+          <a href="{% querystring page=page.next_page_number %}">Next &rarr;</a>
+        {% else %}
+          <span>Next &rarr;</span>
+        {% endif %}
+      </nav>
+    {% endif %}
+
+  </main>
+
+  <script src="{% static 'lucid/js/staff.js' %}" defer></script>
+
+</body>
+</html>

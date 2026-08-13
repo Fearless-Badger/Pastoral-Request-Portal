@@ -64,6 +64,8 @@ INSTALLED_APPS = [
     "django.contrib.sessions",
     "django.contrib.messages",
     "django.contrib.staticfiles",
+    # Only for naturaltime ("2 hours ago") on the staff page.
+    "django.contrib.humanize",
     "lucid",
 ]
 
