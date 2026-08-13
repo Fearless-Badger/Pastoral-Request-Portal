@@ -40,7 +40,7 @@ def submit_request(request):
         form = PrayerRequestForm(request.POST)
         if form.is_valid():
             form.save()
-            messages.success(request, "Thank you. Your request has been sent to our pastors.")
+            messages.success(request, "Thank you. Our church family will be praying for you.")
             return redirect("submit_request")
     else:
         form = PrayerRequestForm()
