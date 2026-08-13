@@ -194,3 +194,17 @@ class StaffModalTests(TestCase):
             self.assertContains(response, label)
 
         self.assertContains(response, '<option value="new" selected>', html=False)
+
+
+@no_manifest
+class AdminBrandingTests(TestCase):
+    """The admin login page is the first thing a staff member sees, and it is
+    reached by being bounced off /staff/. It has to look like the church."""
+
+    def test_login_page_is_branded_and_loads_the_church_palette(self):
+        response = self.client.get(reverse("admin:login"), {"next": "/staff/"})
+
+        self.assertContains(response, "Lake Hills Baptist Church")
+        self.assertNotContains(response, "Django administration")
+        # Proves the base_site.html override in DIRS beat the one Django ships.
+        self.assertContains(response, "lucid/css/admin.css")

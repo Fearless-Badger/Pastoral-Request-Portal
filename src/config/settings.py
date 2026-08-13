@@ -87,7 +87,10 @@ ROOT_URLCONF = "config.urls"
 TEMPLATES = [
     {
         "BACKEND": "django.template.backends.django.DjangoTemplates",
-        "DIRS": [],
+        # Holds admin/base_site.html. DIRS is searched before APP_DIRS, which is
+        # the only reason that override wins over the copy shipped inside
+        # django.contrib.admin. App templates still live in lucid/templates/.
+        "DIRS": [BASE_DIR / "templates"],
         "APP_DIRS": True,
         "OPTIONS": {
             "context_processors": [

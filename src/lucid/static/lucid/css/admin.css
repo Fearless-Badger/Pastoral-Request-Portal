@@ -1,0 +1,165 @@
+/* Lake Hills theming for the Django admin.
+   Loaded from admin/base_site.html, after admin/css/base.css and
+   admin/css/dark_mode.css, so the selectors below deliberately mirror theirs
+   and win on load order rather than by being more specific. Break that mirror
+   and the theme toggle stops working, because that is what the two attribute
+   selectors are for.
+
+   The palette is spelled out here rather than pulled from site.css, since the
+   admin pages do not load site.css. Values match its :root tokens. */
+
+html[data-theme="light"],
+:root {
+  --primary: #14707f;
+  --secondary: #0e5464;
+  --primary-fg: #fff;
+
+  /* Not decorative: the calendar widget paints its month caption with this and
+     hardcodes #333 on top, so it has to stay light enough to read against. */
+  --accent: #cfe4e8;
+
+  --body-fg: #15242a;
+  --body-bg: #fff;
+  --body-quiet-color: #5d6d74;
+  --body-medium-color: #3a4a52;
+  --body-loud-color: #0a4049;
+
+  --header-color: #dbe9ec;
+  --header-branding-color: #fff;
+  --header-bg: #0e5464;
+  --header-link-color: #fff;
+
+  --breadcrumbs-fg: #cfe0e4;
+  --breadcrumbs-link-fg: #fff;
+  --breadcrumbs-bg: #0a4049;
+
+  --link-fg: #0e5464;
+  --link-hover-color: #0a4049;
+  --link-selected-fg: #14707f;
+
+  --hairline-color: #dde4e7;
+  --border-color: #c3ced3;
+
+  --error-fg: #b3261e;
+  --message-success-bg: #e7f4ec;
+  --message-error-bg: #fdecea;
+
+  --darkened-bg: #f3f6f7;
+  --selected-bg: #e6eef0;
+  --selected-row: #e7f4ec;
+
+  --button-bg: #14707f;
+  --button-hover-bg: #0e5464;
+  --default-button-bg: #0a4049;
+  --default-button-hover-bg: #0e5464;
+
+  /* The purple half of the site's gradient. Add and History are a different
+     kind of action from Save, so they get the other family. */
+  --object-tools-bg: #4a3570;
+  --object-tools-hover-bg: #6b4f9e;
+}
+
+@media (prefers-color-scheme: dark) {
+  :root {
+    --primary: #14707f;
+    --primary-fg: #f7f7f7;
+
+    --body-fg: #e8eef0;
+    --body-bg: #101a1d;
+    --body-quiet-color: #a9bcc2;
+    --body-medium-color: #cbd9dd;
+    --body-loud-color: #fff;
+
+    --header-color: #cfe0e4;
+    --header-bg: #0a4049;
+
+    --breadcrumbs-fg: #a9bcc2;
+    --breadcrumbs-link-fg: #dbe9ec;
+    --breadcrumbs-bg: #0e3a42;
+
+    --link-fg: #7fd0dd;
+    --link-hover-color: #a8e2ec;
+    --link-selected-fg: #9db4dd;
+
+    --hairline-color: #1e2a2e;
+    --border-color: #2b3a3f;
+
+    --error-fg: #e88b85;
+    --message-success-bg: #17452c;
+    --message-error-bg: #4a1512;
+
+    --darkened-bg: #162226;
+    --selected-bg: #1b2a2e;
+    --selected-row: #123a41;
+
+    --button-bg: #14707f;
+    --button-hover-bg: #1a8a9c;
+    --default-button-bg: #0e5464;
+    --default-button-hover-bg: #14707f;
+  }
+}
+
+html[data-theme="dark"] {
+  --primary: #14707f;
+  --primary-fg: #f7f7f7;
+
+  --body-fg: #e8eef0;
+  --body-bg: #101a1d;
+  --body-quiet-color: #a9bcc2;
+  --body-medium-color: #cbd9dd;
+  --body-loud-color: #fff;
+
+  --header-color: #cfe0e4;
+  --header-bg: #0a4049;
+
+  --breadcrumbs-fg: #a9bcc2;
+  --breadcrumbs-link-fg: #dbe9ec;
+  --breadcrumbs-bg: #0e3a42;
+
+  --link-fg: #7fd0dd;
+  --link-hover-color: #a8e2ec;
+  --link-selected-fg: #9db4dd;
+
+  --hairline-color: #1e2a2e;
+  --border-color: #2b3a3f;
+
+  --error-fg: #e88b85;
+  --message-success-bg: #17452c;
+  --message-error-bg: #4a1512;
+
+  --darkened-bg: #162226;
+  --selected-bg: #1b2a2e;
+  --selected-row: #123a41;
+
+  --button-bg: #14707f;
+  --button-hover-bg: #1a8a9c;
+  --default-button-bg: #0e5464;
+  --default-button-hover-bg: #14707f;
+}
+
+/* The same gradient as the public hero and the staff header. This cannot ride
+   on --header-bg, because the admin also feeds that token to module headings
+   and to a fieldset border-color, where a gradient is an invalid value and the
+   whole declaration would be dropped. */
+#header {
+  background: linear-gradient(135deg, #6b4f9e 0%, #26385f 45%, #0a4049 100%);
+}
+
+/* #site-name paints its own link with var(--accent), which is spoken for by the
+   calendar, so the church name is set here instead. Weight and tracking match
+   the h1 on the staff page. */
+#site-name {
+  font-weight: 600;
+  letter-spacing: -0.01em;
+}
+
+#site-name a:link,
+#site-name a:visited {
+  color: #fff;
+}
+
+/* The login card is only 28em wide and the theme toggle sits beside the name,
+   so the full church name needs to come down a size to stay on one line. */
+.login #site-name {
+  font-size: 1.125rem;
+}
