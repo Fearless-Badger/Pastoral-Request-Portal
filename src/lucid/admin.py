@@ -1,4 +1,5 @@
 from django.contrib import admin
+from django.utils.text import Truncator
 
 from .models import PrayerRequest
 
@@ -12,9 +13,14 @@ admin.site.index_title = "Administration"
 
 @admin.register(PrayerRequest)
 class PrayerRequestAdmin(admin.ModelAdmin):
-    list_display = ["name", "status", "submitted_at"]
+    list_display = ["name", "preview", "status", "submitted_at"]
     list_filter = ["status"]
     search_fields = ["name", "request"]
+
+    @admin.display(description="Request")
+    def preview(self, obj):
+        # Truncator counts the ellipsis toward the 20, so the column never widens.
+        return Truncator(obj.request).chars(20)
 
     def get_readonly_fields(self, request, obj=None):
         if obj:

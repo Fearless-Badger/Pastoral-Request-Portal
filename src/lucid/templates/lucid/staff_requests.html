@@ -18,7 +18,6 @@
       </a>
 
       <div class="staff-head__actions">
-        <a href="/admin/">Admin</a>
         <form method="post" action="{% url 'admin:logout' %}">
           {% csrf_token %}
           <button type="submit">Sign out</button>

@@ -1,0 +1,26 @@
+{% extends "admin/base_site.html" %}
+{% load i18n %}
+
+{% comment %}
+  A copy of Django 6.0's registration/logged_out.html, which django.contrib.admin
+  ships and LogoutView renders by default, with both links pointed at /staff/
+  instead of /admin/. Pastors sign in to reach /staff/, so sending them to the
+  admin index after signing out is a dead end for them. DIRS is searched before
+  APP_DIRS, which is what makes this win over the copy inside django.contrib.admin.
+
+  "Log in again" deliberately links to the staff page rather than the login page.
+  They are signed out by now, so it bounces through /admin/login/?next=/staff/ and
+  lands them back on /staff/ once they are in.
+{% endcomment %}
+
+{% block breadcrumbs %}<div class="breadcrumbs"><a href="{% url 'staff_requests' %}">{% translate 'Home' %}</a></div>{% endblock %}
+
+{% block nav-sidebar %}{% endblock %}
+
+{% block content %}
+
+<p>{% translate "You are signed out." %}</p>
+
+<p><a href="{% url 'staff_requests' %}">{% translate 'Log in again' %}</a></p>
+
+{% endblock %}

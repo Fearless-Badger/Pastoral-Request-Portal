@@ -224,6 +224,19 @@ class AdminBrandingTests(TestCase):
         # Proves the base_site.html override in DIRS beat the one Django ships.
         self.assertContains(response, "lucid/css/admin.css")
 
+    def test_signing_out_points_home_and_log_in_again_at_staff(self):
+        User.objects.create_user("pastor", password="pw-for-tests-only", is_staff=True)
+        self.client.login(username="pastor", password="pw-for-tests-only")
+
+        # POST, not GET. Django removed logout-by-GET in 5.0.
+        response = self.client.post(reverse("admin:logout"))
+
+        self.assertContains(response, '<a href="/staff/">Home</a>')
+        self.assertContains(response, '<a href="/staff/">Log in again</a>')
+        # The site name at the top left counts too. Nothing on this page should
+        # offer a non-technical staff member a way into the admin.
+        self.assertNotContains(response, 'href="/admin/"')
+
 
 class TurnstileVerifyTests(SimpleTestCase):
     """urlopen is patched in every test here. Reaching Cloudflare for real would

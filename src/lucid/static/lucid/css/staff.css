@@ -39,7 +39,6 @@
   gap: 0.6rem;
 }
 
-.staff-head__actions a,
 .staff-head__actions button {
   padding: 0.4rem 0.9rem;
   font: inherit;
@@ -55,7 +54,6 @@
   transition: background 0.15s;
 }
 
-.staff-head__actions a:hover,
 .staff-head__actions button:hover {
   background: rgba(255, 255, 255, 0.2);
 }
@@ -73,7 +71,6 @@
 }
 
 .staff-head__logo:focus-visible,
-.staff-head__actions a:focus-visible,
 .staff-head__actions button:focus-visible {
   outline: 3px solid #fff;
   outline-offset: 3px;

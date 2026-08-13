@@ -14,7 +14,13 @@
 {% block extrastyle %}{{ block.super }}<link rel="stylesheet" href="{% static 'lucid/css/admin.css' %}">{% endblock %}
 
 {% block branding %}
-<div id="site-name"><a href="{% url 'admin:index' %}">{{ site_header|default:_('Django administration') }}</a></div>
+{% comment %}
+  Django links the site name at the top left to the admin index. Here it goes to
+  /staff/ instead, because that is home for the people signing in. This applies to
+  every admin page, including login and logout, which are the two they actually
+  see. Inside the admin, the breadcrumbs still lead back to the index.
+{% endcomment %}
+<div id="site-name"><a href="{% url 'staff_requests' %}">{{ site_header|default:_('Django administration') }}</a></div>
 {% if user.is_anonymous %}
   {% include "admin/color_theme_toggle.html" %}
 {% endif %}
