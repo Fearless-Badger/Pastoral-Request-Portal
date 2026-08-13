@@ -54,6 +54,13 @@ SECURE_HSTS_SECONDS: int = 30
 SECURE_HSTS_INCLUDE_SUBDOMAINS: bool = PROD
 SECURE_HSTS_PRELOAD: bool = PROD
 
+# Cloudflare Turnstile, on the public prayer form only. Both blank, which is the
+# default, switches the widget and the verification off entirely. That off switch
+# is what lets the test suite and a fresh clone run with no keys and no network.
+# lucid.checks guards against them being blank or still on a test key in prod.
+TURNSTILE_SITE_KEY: str = os.getenv("TURNSTILE_SITE_KEY", "")
+TURNSTILE_SECRET_KEY: str = os.getenv("TURNSTILE_SECRET_KEY", "")
+
 
 # Application definition
 

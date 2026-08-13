@@ -1,5 +1,6 @@
 from datetime import timedelta
 
+from django.conf import settings
 from django.contrib import messages
 from django.contrib.admin.views.decorators import staff_member_required
 from django.core.paginator import Paginator
@@ -45,7 +46,16 @@ def submit_request(request):
     else:
         form = PrayerRequestForm()
 
-    return render(request, "lucid/prayer_form.html", {"form": form})
+    return render(
+        request,
+        "lucid/prayer_form.html",
+        {
+            "form": form,
+            # Only so the template can draw the widget. Verification itself lives
+            # in the form's clean(), which is why nothing else in this view moved.
+            "turnstile_site_key": settings.TURNSTILE_SITE_KEY,
+        },
+    )
 
 
 @staff_member_required

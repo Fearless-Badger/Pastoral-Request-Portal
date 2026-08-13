@@ -7,6 +7,10 @@
   <link rel="icon" href="{% static 'lucid/img/favicon.jpg' %}">
   <link rel="apple-touch-icon" href="{% static 'lucid/img/favicon.jpg' %}">
   <link rel="stylesheet" href="{% static 'lucid/css/site.css' %}">
+  {% if turnstile_site_key %}
+    <script src="https://challenges.cloudflare.com/turnstile/v0/api.js" async defer></script>
+  {% endif %}
+  <script src="{% static 'lucid/js/prayer_form.js' %}" defer></script>
 </head>
 <body>
 
@@ -39,6 +43,9 @@
       <form method="post" novalidate>
         {% csrf_token %}
 
+        {# A failed Turnstile check lands here, or the form appears to do nothing. #}
+        {{ form.non_field_errors }}
+
         <div class="field">
           <label for="{{ form.name.id_for_label }}">
             Your name <span class="optional">(optional)</span>
@@ -51,7 +58,17 @@
           <label for="{{ form.request.id_for_label }}">Your request</label>
           {{ form.request.errors }}
           {{ form.request }}
+          {# Hidden by default. With JS off, the textarea's maxlength is the stop. #}
+          <p class="counter" data-counter hidden aria-hidden="true"></p>
+          {# Announced on a pause rather than per keystroke; see prayer_form.js. #}
+          <p class="visually-hidden" data-counter-status role="status" aria-live="polite"></p>
         </div>
+
+        {# Inside the form: the script injects its hidden token input here. #}
+        {# data-theme is pinned; the default auto would go dark on this white card. #}
+        {% if turnstile_site_key %}
+          <div class="cf-turnstile" data-sitekey="{{ turnstile_site_key }}" data-theme="light"></div>
+        {% endif %}
 
         <button class="btn" type="submit">Submit request</button>
       </form>
