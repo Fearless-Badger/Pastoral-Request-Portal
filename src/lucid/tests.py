@@ -281,7 +281,9 @@ class PrayerFormWithoutTurnstileTests(TestCase):
 
     def test_verification_is_never_reached(self):
         with mock.patch.object(turnstile, "verify", side_effect=AssertionError("verified")):
-            response = self.client.post(reverse("submit_request"), {"request": "Please pray"})
+            response = self.client.post(
+                reverse("submit_request"), {"name": "Sarah", "request": "Please pray"}
+            )
 
         self.assertEqual(response.status_code, 302)
         self.assertEqual(PrayerRequest.objects.count(), 1)
@@ -311,7 +313,9 @@ class PrayerFormTurnstileTests(TestCase):
         """The one that matters. A rejected challenge must not write a row, and
         the person has to be told why rather than watching the form do nothing."""
         with mock.patch.object(turnstile, "verify", return_value=False):
-            response = self.client.post(self.url, {"request": "Please pray"})
+            response = self.client.post(
+                self.url, {"name": "Sarah", "request": "Please pray"}
+            )
 
         self.assertEqual(response.status_code, 200)
         self.assertContains(response, "Please complete the verification")
@@ -320,7 +324,12 @@ class PrayerFormTurnstileTests(TestCase):
     def test_a_passed_challenge_saves(self):
         with mock.patch.object(turnstile, "verify", return_value=True) as verify:
             response = self.client.post(
-                self.url, {"request": "Please pray", "cf-turnstile-response": "token"}
+                self.url,
+                {
+                    "name": "Sarah",
+                    "request": "Please pray",
+                    "cf-turnstile-response": "token",
+                },
             )
 
         self.assertEqual(response.status_code, 302)
@@ -331,19 +340,58 @@ class PrayerFormTurnstileTests(TestCase):
 
 @no_manifest
 @TURNSTILE_OFF
+class NameRequiredTests(TestCase):
+    """The model still has blank=True, so nothing but the form enforces this."""
+
+    @classmethod
+    def setUpTestData(cls):
+        cls.url = reverse("submit_request")
+
+    def test_a_missing_name_is_rejected(self):
+        response = self.client.post(self.url, {"request": "Please pray"})
+
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(PrayerRequest.objects.count(), 0)
+
+    def test_a_name_of_only_spaces_is_rejected(self):
+        """CharField strips before validating, which is the whole reason a
+        minimum length validator is not needed here."""
+        response = self.client.post(self.url, {"name": "   ", "request": "Please pray"})
+
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(PrayerRequest.objects.count(), 0)
+
+    def test_a_name_of_one_character_is_enough(self):
+        response = self.client.post(self.url, {"name": "J", "request": "Please pray"})
+
+        self.assertEqual(response.status_code, 302)
+        self.assertEqual(PrayerRequest.objects.get().name, "J")
+
+    def test_the_form_no_longer_offers_the_name_as_optional(self):
+        response = self.client.get(self.url)
+
+        self.assertNotContains(response, "(optional)")
+
+
+@no_manifest
+@TURNSTILE_OFF
 class RequestLengthTests(TestCase):
     @classmethod
     def setUpTestData(cls):
         cls.url = reverse("submit_request")
 
     def test_text_at_the_cap_is_accepted(self):
-        response = self.client.post(self.url, {"request": "p" * REQUEST_MAX_LENGTH})
+        response = self.client.post(
+            self.url, {"name": "Sarah", "request": "p" * REQUEST_MAX_LENGTH}
+        )
 
         self.assertEqual(response.status_code, 302)
         self.assertEqual(PrayerRequest.objects.count(), 1)
 
     def test_text_over_the_cap_is_rejected(self):
-        response = self.client.post(self.url, {"request": "p" * (REQUEST_MAX_LENGTH + 1)})
+        response = self.client.post(
+            self.url, {"name": "Sarah", "request": "p" * (REQUEST_MAX_LENGTH + 1)}
+        )
 
         self.assertEqual(response.status_code, 200)
         self.assertEqual(PrayerRequest.objects.count(), 0)

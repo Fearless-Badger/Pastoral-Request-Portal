@@ -167,11 +167,6 @@ body {
   margin-bottom: 0.4rem;
 }
 
-.optional {
-  font-weight: 400;
-  color: var(--muted);
-}
-
 .field input[type="text"],
 .field textarea {
   width: 100%;

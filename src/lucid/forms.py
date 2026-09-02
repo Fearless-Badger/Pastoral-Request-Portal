@@ -31,6 +31,15 @@ class PrayerRequestForm(forms.ModelForm):
         # for free.
         fields: list[str] = ["name", "request"]
 
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+
+        # The model keeps blank=True so the rows already in the database, and
+        # anything the admin adds, stay valid without a migration. Requiring it
+        # here scopes the rule to the public form, which is where it belongs.
+        # CharField strips by default, so a box of spaces fails this too.
+        self.fields["name"].required = True
+
     def clean(self):
         cleaned_data = super().clean()
 
