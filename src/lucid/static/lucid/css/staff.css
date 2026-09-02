@@ -207,18 +207,6 @@
   border-radius: 8px;
 }
 
-.btn--ghost {
-  color: var(--teal-800);
-  background: transparent;
-  border: 1px solid var(--line);
-}
-
-.btn--ghost:hover {
-  color: var(--teal-900);
-  background: var(--page);
-  border-color: var(--teal-700);
-}
-
 /* ---------- Rows ---------- */
 
 /* One surface with hairline dividers, not a stack of cards. No per-row radius
@@ -424,7 +412,7 @@ dialog:not([open]) {
   flex-wrap: wrap;
   align-items: center;
   gap: 0.5rem;
-  margin: 0 0 0.9rem;
+  margin: 0;
 }
 
 .modal__set label {
@@ -448,24 +436,6 @@ dialog:not([open]) {
   outline: none;
   border-color: var(--teal-700);
   box-shadow: 0 0 0 3px rgba(20, 112, 127, 0.18);
-}
-
-/* One-click shortcuts for the two moves that happen most, with Close pushed to
-   the far end so it is never hit by accident. */
-.modal__quick {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 0.4rem;
-  padding-top: 0.9rem;
-  border-top: 1px solid var(--line);
-}
-
-.modal__quick form {
-  margin: 0;
-}
-
-.modal__quick form:last-child {
-  margin-left: auto;
 }
 
 /* ---------- Pager ---------- */
@@ -505,17 +475,5 @@ dialog:not([open]) {
   .row__open {
     grid-template-columns: 1fr;
     gap: 0.55rem;
-  }
-
-  /* Close keeps its own line down here rather than sharing one with the
-     actions, where a mis-tap would archive something. */
-  .modal__quick form:last-child {
-    width: 100%;
-    margin-left: 0;
-    margin-top: 0.3rem;
-  }
-
-  .modal__quick form:last-child .btn--sm {
-    width: 100%;
   }
 }

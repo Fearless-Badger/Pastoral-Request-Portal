@@ -140,37 +140,6 @@
                 </select>
                 <button class="btn btn--sm" type="submit">Save</button>
               </form>
-
-              <div class="modal__quick">
-                {% if item.status != "prayed" %}
-                  <form method="post" action="{% querystring %}">
-                    {% csrf_token %}
-                    <input type="hidden" name="pk" value="{{ item.pk }}">
-                    <input type="hidden" name="status" value="prayed">
-                    <button class="btn btn--sm" type="submit">Prayed for</button>
-                  </form>
-                {% else %}
-                  <form method="post" action="{% querystring %}">
-                    {% csrf_token %}
-                    <input type="hidden" name="pk" value="{{ item.pk }}">
-                    <input type="hidden" name="status" value="new">
-                    <button class="btn btn--sm btn--ghost" type="submit">Back to new</button>
-                  </form>
-                {% endif %}
-
-                {% if item.status != "archived" %}
-                  <form method="post" action="{% querystring %}">
-                    {% csrf_token %}
-                    <input type="hidden" name="pk" value="{{ item.pk }}">
-                    <input type="hidden" name="status" value="archived">
-                    <button class="btn btn--sm btn--ghost" type="submit">Archive</button>
-                  </form>
-                {% endif %}
-
-                <form method="dialog">
-                  <button class="btn btn--sm btn--ghost" type="submit">Close</button>
-                </form>
-              </div>
             </div>
           </dialog>
         </li>
