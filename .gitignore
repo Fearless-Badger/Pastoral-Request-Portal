@@ -225,3 +225,7 @@ plan.md
 db.sqlite3
 db.sqlite3-shm
 db.sqlite3-wal
+
+# Notes
+notes.txt
+notes.md
