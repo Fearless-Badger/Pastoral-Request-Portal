@@ -1,11 +1,10 @@
 """Delete prayer requests older than settings.PRAYER_REQUEST_RETENTION_DAYS.
 
-Run daily from a host cron on the droplet:
+Runs daily from the `purge` service in docker-compose.yml. The privacy page tells
+the public requests are deleted on this schedule, so that service is what makes
+the sentence true. By hand:
 
-    15 3 * * *  cd <repo> && docker compose exec -T web python src/manage.py purge_old_requests
-
-The privacy page tells the public requests are deleted on this schedule, so the
-cron is what makes that sentence true.
+    docker compose exec -T web python src/manage.py purge_old_requests --dry-run
 """
 
 from datetime import timedelta

@@ -1,5 +1,5 @@
 # Docker's json-file driver never rotates by default, so container output would
-# grow forever. Capped for both services: gunicorn's request log and Caddy's
+# grow forever. Capped for every service: gunicorn's request log and Caddy's
 # runtime log (its access log goes to a file instead, see Caddyfile).
 x-logging: &rotated-logs
   driver: json-file
@@ -7,19 +7,39 @@ x-logging: &rotated-logs
     max-size: "10m"
     max-file: "3"
 
+# Shared by web and purge: same image, same .env, same database volume.
+x-app: &app
+  build: .
+  platform: linux/amd64
+  restart: unless-stopped
+  env_file: .env
+  environment:
+    DATA_DIR: /app/data
+  volumes:
+    - lucid_data:/app/data
+  logging: *rotated-logs
+
 services:
   web:
-    build: .
-    platform: linux/amd64
-    restart: unless-stopped
-    env_file: .env
-    environment:
-      DATA_DIR: /app/data
-    volumes:
-      - lucid_data:/app/data
+    <<: *app
     expose:
       - "8000"
-    logging: *rotated-logs
+
+  # Deletes requests older than PRAYER_REQUEST_RETENTION_DAYS (settings.py), a
+  # minute after startup and then daily. Lives here rather than in a host cron
+  # so it deploys with everything else and can't be forgotten on a new droplet.
+  # Check on it with: docker compose logs purge
+  purge:
+    <<: *app
+    depends_on:
+      - web
+    # Skips docker-entrypoint.sh, whose `migrate` would race the one web runs.
+    # The minute's head start lets web finish migrating a brand-new database.
+    entrypoint: ["sh", "-c"]
+    command: ["sleep 60; while true; do python src/manage.py purge_old_requests; sleep 86400; done"]
+    # sh as PID 1 ignores SIGTERM, so every `docker compose down` would sit out
+    # the 10s timeout. init puts a tiny init process in front to pass it along.
+    init: true
 
   caddy:
     image: caddy:2-alpine
