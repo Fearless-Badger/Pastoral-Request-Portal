@@ -1,3 +1,12 @@
+# Docker's json-file driver never rotates by default, so container output would
+# grow forever. Capped for both services: gunicorn's request log and Caddy's
+# runtime log (its access log goes to a file instead, see Caddyfile).
+x-logging: &rotated-logs
+  driver: json-file
+  options:
+    max-size: "10m"
+    max-file: "3"
+
 services:
   web:
     build: .
@@ -10,6 +19,7 @@ services:
       - lucid_data:/app/data
     expose:
       - "8000"
+    logging: *rotated-logs
 
   caddy:
     image: caddy:2-alpine
@@ -26,8 +36,12 @@ services:
       - ./Caddyfile:/etc/caddy/Caddyfile:ro
       - caddy_data:/data
       - caddy_config:/config
+      # Rotated access logs (see Caddyfile). A volume so they survive a recreate.
+      - caddy_logs:/var/log/caddy
+    logging: *rotated-logs
 
 volumes:
   lucid_data:
   caddy_data:
   caddy_config:
+  caddy_logs:

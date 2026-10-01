@@ -5,8 +5,12 @@ from urllib.error import URLError
 
 from django.conf import settings
 from django.contrib.auth.models import User
-from django.test import SimpleTestCase, TestCase, override_settings
+from django.core.management import call_command
+from django.db import connection
+from django.test import SimpleTestCase, TestCase, TransactionTestCase, override_settings
+from django.test.utils import CaptureQueriesContext
 from django.urls import reverse
+from django.utils import timezone
 
 from . import turnstile
 from .checks import turnstile_is_configured_for_production
@@ -69,6 +73,17 @@ class StaffAccessTests(TestCase):
 
         self.assertEqual(response.status_code, 200)
         self.assertContains(response, SECRET)
+
+    def test_staff_page_carries_the_reporting_hotline(self):
+        """The page where a reportable request gets read is where the number
+        has to be. Pins the dialable form, not just the printed one."""
+        User.objects.create_user("pastor", password="pw-for-tests-only", is_staff=True)
+        self.client.login(username="pastor", password="pw-for-tests-only")
+
+        response = self.client.get(self.url)
+
+        self.assertContains(response, 'href="tel:+18008005556"')
+        self.assertContains(response, "1-800-800-5556")
 
 
 @no_manifest
@@ -375,6 +390,71 @@ class NameRequiredTests(TestCase):
 
 @no_manifest
 @TURNSTILE_OFF
+class PrayerFormSafetyCopyTests(TestCase):
+    """Indiana makes everyone a mandatory reporter, so the form must never
+    promise a confidentiality the church is required by law to break."""
+
+    @classmethod
+    def setUpTestData(cls):
+        cls.url = reverse("submit_request")
+
+    def test_the_absolute_confidentiality_promise_is_gone(self):
+        response = self.client.get(self.url)
+
+        self.assertNotContains(response, "can see what you send")
+        self.assertContains(response, "we may need to involve the appropriate authorities")
+
+    def test_crisis_numbers_are_dialable(self):
+        response = self.client.get(self.url)
+
+        self.assertContains(response, 'href="tel:911"')
+        self.assertContains(response, 'href="tel:988"')
+
+    def test_links_to_the_privacy_page(self):
+        response = self.client.get(self.url)
+
+        self.assertContains(response, f'href="{reverse("privacy")}"')
+
+
+@no_manifest
+@TURNSTILE_ON
+class PrivacyPageTests(TestCase):
+    """Turnstile is deliberately on here, to prove the page leaves it out."""
+
+    @classmethod
+    def setUpTestData(cls):
+        cls.url = reverse("privacy")
+
+    def test_quotes_the_retention_window_from_settings(self):
+        """The same setting purge_old_requests enforces. If this number were
+        typed into the template, the two could disagree."""
+        with override_settings(PRAYER_REQUEST_RETENTION_DAYS=90):
+            response = self.client.get(self.url)
+
+        self.assertEqual(response.status_code, 200)
+        self.assertContains(response, "deleted automatically 90 days")
+
+    def test_states_the_reporting_exception_and_never_selling(self):
+        response = self.client.get(self.url)
+
+        self.assertContains(response, "Indiana law requires us to report suspected child abuse")
+        self.assertContains(response, "We never sell prayer requests")
+
+    def test_does_not_load_turnstile(self):
+        response = self.client.get(self.url)
+
+        self.assertNotContains(response, "challenges.cloudflare.com")
+        self.assertNotContains(response, "cf-turnstile")
+
+    def test_no_template_comments_leak_into_the_page(self):
+        response = self.client.get(self.url)
+
+        self.assertNotContains(response, "{#")
+        self.assertNotContains(response, "comment %}")
+
+
+@no_manifest
+@TURNSTILE_OFF
 class RequestLengthTests(TestCase):
     @classmethod
     def setUpTestData(cls):
@@ -447,3 +527,86 @@ class TurnstileDeployCheckTests(SimpleTestCase):
             ),
             [],
         )
+
+
+@override_settings(PRAYER_REQUEST_RETENTION_DAYS=365)
+class PurgeOldRequestsTests(TestCase):
+    """The privacy page promises this deletion to the public, so the cutoff is
+    pinned to the hour rather than approximately."""
+
+    def make(self, status=PrayerRequest.Status.NEW, **age):
+        row = PrayerRequest.objects.create(request="Please pray", status=status)
+        PrayerRequest.objects.filter(pk=row.pk).update(
+            submitted_at=timezone.now() - timedelta(**age)
+        )
+        return row
+
+    def purge(self, *args):
+        out = io.StringIO()
+        call_command("purge_old_requests", *args, stdout=out)
+        return out.getvalue()
+
+    def test_only_requests_past_the_window_are_deleted(self):
+        self.make(days=365, hours=1)
+        kept = self.make(days=364, hours=23)
+
+        output = self.purge()
+
+        self.assertEqual(list(PrayerRequest.objects.all()), [kept])
+        self.assertIn("Deleted 1 prayer request(s) older than 365 days.", output)
+
+    def test_status_does_not_protect_an_old_request(self):
+        """Archived is the obvious one to delete. New and prayed-for are the
+        ones a status-based rule would have kept forever."""
+        for status in PrayerRequest.Status.values:
+            self.make(status=status, days=400)
+
+        self.purge()
+
+        self.assertEqual(PrayerRequest.objects.count(), 0)
+
+    def test_dry_run_counts_without_deleting(self):
+        self.make(days=400)
+        self.make(days=1)
+
+        output = self.purge("--dry-run")
+
+        self.assertEqual(PrayerRequest.objects.count(), 2)
+        self.assertIn("Would delete 1 prayer request(s) older than 365 days.", output)
+
+    @override_settings(PRAYER_REQUEST_RETENTION_DAYS=30)
+    def test_the_window_comes_from_settings(self):
+        self.make(days=31)
+        kept = self.make(days=29)
+
+        self.purge()
+
+        self.assertEqual(list(PrayerRequest.objects.all()), [kept])
+
+    def test_secure_delete_is_on(self):
+        """Without it a DELETE leaves the text sitting in free pages, and any
+        copy of the database file still holds every purged request."""
+        with connection.cursor() as cursor:
+            cursor.execute("PRAGMA secure_delete")
+            self.assertEqual(cursor.fetchone()[0], 1)
+
+
+@override_settings(PRAYER_REQUEST_RETENTION_DAYS=365)
+class PurgeOutsideATransactionTests(TransactionTestCase):
+    """TestCase wraps every test in a transaction, which skips the WAL
+    checkpoint. Cron runs in autocommit, so this is the path production takes."""
+
+    def test_purge_and_checkpoint_run_cleanly(self):
+        row = PrayerRequest.objects.create(request="Please pray")
+        PrayerRequest.objects.filter(pk=row.pk).update(
+            submitted_at=timezone.now() - timedelta(days=400)
+        )
+        out, err = io.StringIO(), io.StringIO()
+
+        with CaptureQueriesContext(connection) as queries:
+            call_command("purge_old_requests", stdout=out, stderr=err)
+
+        self.assertEqual(PrayerRequest.objects.count(), 0)
+        self.assertIn("Deleted 1 prayer request(s)", out.getvalue())
+        self.assertEqual(err.getvalue(), "")
+        self.assertTrue(any("wal_checkpoint" in q["sql"] for q in queries.captured_queries))

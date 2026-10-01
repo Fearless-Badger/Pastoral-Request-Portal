@@ -154,6 +154,36 @@ body {
   text-align: center;
 }
 
+.reassure a,
+.form-note a,
+.prose a {
+  color: var(--teal-700);
+  font-weight: 600;
+}
+
+/* ---------- Privacy page ---------- */
+
+.prose h2 {
+  margin: 1.75rem 0 0.35rem;
+  font-size: 1.02rem;
+  font-weight: 600;
+}
+
+.prose h2:first-child {
+  margin-top: 0;
+}
+
+.prose p {
+  margin: 0;
+}
+
+/* Two classes, so it outranks the .prose p reset above. */
+.prose .prose__updated {
+  margin-top: 2rem;
+  font-size: 0.82rem;
+  color: var(--muted);
+}
+
 /* ---------- Form ---------- */
 
 .field + .field {
@@ -217,6 +247,20 @@ body {
 /* The button's own top margin handles the gap below the widget. */
 .cf-turnstile {
   margin-top: 1.5rem;
+}
+
+/* The crisis line above Submit. Quiet enough not to alarm anyone sending a
+   routine request, but in the path of everyone who submits. */
+.form-note {
+  margin: 1.5rem 0 0;
+  font-size: 0.85rem;
+  color: var(--muted);
+}
+
+/* The note already opens the gap above it; the full 1.75rem on top reads as
+   the button belonging to something else. */
+.form-note + .btn {
+  margin-top: 1rem;
 }
 
 /* Only shown once the request text nears the cap, so it reads as a heads-up

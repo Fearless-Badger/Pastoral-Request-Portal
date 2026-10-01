@@ -3,8 +3,17 @@
 	encode zstd gzip
 	reverse_proxy web:8000
 
+	# Access log, the only place a visitor's IP address is recorded. The privacy
+	# page promises it is gone after about 30 days, so rotation is by time: a
+	# size-only limit would never trip on traffic this light. roll_keep defaults
+	# to 10, which would quietly cut the window to 10 days.
+	# Tail it with: docker compose exec caddy tail -f /var/log/caddy/access.log
 	log {
-		output stderr
+		output file /var/log/caddy/access.log {
+			roll_interval 24h
+			roll_keep 30
+			roll_keep_for 720h
+		}
 		format console
 	}
 }

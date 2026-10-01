@@ -58,6 +58,16 @@ def submit_request(request):
     )
 
 
+def privacy(request):
+    # The page quotes the same setting purge_old_requests enforces, so the
+    # promise and the cron cannot drift apart.
+    return render(
+        request,
+        "lucid/privacy.html",
+        {"retention_days": settings.PRAYER_REQUEST_RETENTION_DAYS},
+    )
+
+
 @staff_member_required
 def staff_requests(request):
     if request.method == "POST":

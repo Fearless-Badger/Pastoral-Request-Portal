@@ -23,5 +23,6 @@ from lucid import views
 urlpatterns = [
     path("admin/", admin.site.urls),
     path("staff/", views.staff_requests, name="staff_requests"),
+    path("privacy/", views.privacy, name="privacy"),
     path("", views.submit_request, name="submit_request"),
 ]

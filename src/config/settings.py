@@ -61,6 +61,11 @@ SECURE_HSTS_PRELOAD: bool = PROD
 TURNSTILE_SITE_KEY: str = os.getenv("TURNSTILE_SITE_KEY", "")
 TURNSTILE_SECRET_KEY: str = os.getenv("TURNSTILE_SECRET_KEY", "")
 
+# Days a prayer request is kept, counted from submission, before
+# `manage.py purge_old_requests` deletes it whatever its status. The privacy page
+# quotes this number to the public, so it lives in reviewed code rather than .env.
+PRAYER_REQUEST_RETENTION_DAYS: int = 365
+
 
 # Application definition
 
@@ -120,7 +125,11 @@ DATABASES = {
         "ENGINE": "django.db.backends.sqlite3",
         "NAME": DATA_DIR / "db.sqlite3",
         "OPTIONS": {
-            "init_command": "PRAGMA journal_mode=WAL; PRAGMA synchronous=NORMAL;",
+            # secure_delete zeroes a deleted row's bytes instead of leaving them in
+            # free pages, so a copy of the file cannot bring back a purged request.
+            "init_command": (
+                "PRAGMA journal_mode=WAL; PRAGMA synchronous=NORMAL; PRAGMA secure_delete=ON;"
+            ),
             "transaction_mode": "IMMEDIATE",
             "timeout": 20,
         },

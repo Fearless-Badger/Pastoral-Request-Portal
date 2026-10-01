@@ -1,0 +1,76 @@
+{% extends "lucid/base_public.html" %}
+
+{% block title %}Privacy{% endblock %}
+
+{% block hero %}
+    <h1>Privacy</h1>
+    <p>What happens to a prayer request after you send it.</p>
+{% endblock %}
+
+{% block content %}
+    {% comment %}
+      Plain promises the church can keep, nothing more. No claims of complying
+      with any law, and every "we don't share" carries its exceptions. The
+      retention number comes from settings, the same value purge_old_requests
+      enforces.
+    {% endcomment %}
+    <article class="card prose">
+
+      <h2>What we collect</h2>
+      <p>
+        The name you enter and your request. A first name, initials, or
+        &ldquo;Anonymous&rdquo; is fine. We don't ask for an email address or
+        phone number, there are no accounts, and we don't use advertising or
+        analytics trackers.
+      </p>
+
+      <h2>Who reads it</h2>
+      <p>
+        Our pastors and prayer team. The people who look after this website for
+        the church can also access stored requests, as part of keeping it running.
+      </p>
+
+      <h2>Services we use</h2>
+      <p>
+        Our hosting provider stores requests on the church's behalf. To keep out
+        spam, the form uses Cloudflare Turnstile, which checks your browser for
+        signs of a bot. Cloudflare receives technical details for that check,
+        such as your IP address and browser type. The check never sends
+        Cloudflare your name or request.
+      </p>
+
+      <h2>When someone may be in danger</h2>
+      <p>
+        Indiana law requires us to report suspected child abuse or neglect. If we
+        believe someone is in danger, we may also contact the appropriate
+        authorities.
+      </p>
+
+      <h2>What we never do</h2>
+      <p>We never sell prayer requests or use them for advertising.</p>
+
+      <h2>How long we keep it</h2>
+      <p>
+        Requests are deleted automatically {{ retention_days }} days after they
+        are submitted. Our web server also keeps a log of visits, with the IP
+        address and time of each one, which is deleted after about 30 days.
+      </p>
+
+      <h2>Removing a request sooner</h2>
+      <p>
+        Call the church office at 219.365.4747 during office hours, and we will
+        remove it.
+      </p>
+
+      <h2>This isn't an emergency service</h2>
+      <p>
+        Requests aren't read around the clock. In an emergency, call
+        <a href="tel:911">911</a>. For a mental health or suicide crisis, call or
+        text <a href="tel:988">988</a>.
+      </p>
+
+      <p class="prose__updated">Last updated September 30, 2026.</p>
+    </article>
+
+    <p class="reassure"><a href="{% url 'submit_request' %}">Back to the prayer form</a></p>
+{% endblock %}
